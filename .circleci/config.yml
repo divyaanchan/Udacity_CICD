@@ -67,7 +67,30 @@ jobs:
              cd ./backend
              sudo  npm  install oauth-sign
              sudo  npm run  test
-  
+
+  scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - run:
+          name: Run audit of  the frontend
+          command: |
+             # Your code here
+             cd ./frontend
+             npm i
+             npm audit fix --audit-level=critical --force
+
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - run:
+          name: Run audit of  the backend
+          command: |
+             # Your code here
+             cd ./backend
+             npm i
+             npm audit fix --audit-level=critical --force
 
 workflows:
   default:
@@ -78,3 +101,7 @@ workflows:
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
