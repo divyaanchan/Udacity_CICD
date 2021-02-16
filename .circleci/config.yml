@@ -111,12 +111,12 @@ jobs:
             ./backip.sh >> .circleci/ansible/inventory.txt
             backendip=$(./backip.sh)
             curl -H "Content-Type: text/plain" -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request PUT --data "$backendip" https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID}
-
+            echo "$backendip" 
             cwid2=$(echo "aws ec2 describe-instances --filters 'Name=tag:project,Values="udapeopleBackend_${CIRCLE_WORKFLOW_ID:0:7}"' --query 'Reservations[*].Instances[*].PublicDnsName' --output text")
             echo $cwid2 > backurl.sh; chmod 755 backurl.sh
             backendurl=$(./backurl.sh)
             curl -H "Content-Type: text/plain" -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request PUT --data "$backendurl" https://api.memstash.io/values/ec2_back_url_${CIRCLE_WORKFLOW_ID}
-
+            echo  $backendurl
       - persist_to_workspace:
           root:  ~/
           paths:
@@ -140,7 +140,8 @@ jobs:
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i ~/project/.circleci/ansibl/inventory.txt configure-server.yml
+            cd ~/project/.circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure
 
 workflows:
