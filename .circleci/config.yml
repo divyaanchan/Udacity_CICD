@@ -135,4 +135,4 @@ workflows:
   default:
     jobs:
     
-      - deploy-infrastructure:
+      - deploy-infrastructure
