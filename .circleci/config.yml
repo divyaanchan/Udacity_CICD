@@ -126,14 +126,14 @@ jobs:
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.12
-	executor: aws-cli/default 
+      executor: aws-cli/default 
     steps:
       - checkout
       - add_ssh_keys:
-	      fingerprints:
-		    - 69:8e:f5:77:fd:38:4a:11:fe:9c:ae:a8:07:9f:10:94
+          fingerprints:
+             - 69:8e:f5:77:fd:38:4a:11:fe:9c:ae:a8:07:9f:10:94
       - attach_workspace:
-	      at: ~/
+          at: ~/
       - run:
           name: Install dependencies
           command: |
