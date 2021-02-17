@@ -359,7 +359,7 @@ jobs:
           # Note to Make http only request. check cloudfront.yml
           command: |
             echo "Update CloudFront"
-            aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="f6cac72"
+            aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID_new="f6cac72"
 
  
 workflows:
