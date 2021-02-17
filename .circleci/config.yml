@@ -366,7 +366,7 @@ jobs:
               echo  $check_for_id
             else
               echo "Fresh Deploy"
-              aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="f6cac72"
+              aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront-f6cac72"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="f6cac72"
             fi
 
  
