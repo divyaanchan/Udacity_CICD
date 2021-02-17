@@ -1,6 +1,33 @@
 version: 2.1
 
-           
+commands:
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            #aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+            #aws cloudformation delete-stack --stack-name udapeople-backendStack-${CIRCLE_WORKFLOW_ID:0:7}
+            #aws cloudformation delete-stack --stack-name udapeople-frontendStack-${CIRCLE_WORKFLOW_ID:0:7}
+            echo  "Deleted"
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.  
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            #SUCCESS=`curl -H "token: bc0ecb36-991a-4dc2-a4a3-5fc4ea7814bd" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}`
+            #if [ "$SUCCESS" == "Migration Successful" ]; 
+            #then
+            #   cd ~/project/backend
+            #   npm install
+            #   npm run migrations:revert
+            #   exit 1
+            #fi
+            exit 1          
 jobs:
   build-frontend:
     docker:
@@ -285,7 +312,44 @@ jobs:
             ANSIBLE_HOST_KEY_CHECKING=False
             pwd
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
-        #- destroy-environment  	 
+        #- destroy-environment
+  
+  smoke-test:
+    docker:
+      - image: python:3.7-alpine3.12 
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl nodejs npm
+            pip install awscli
+      - run:
+          name: Backend  Smoke test
+          command: |
+            #back_ip=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID})
+            back_ip="18.237.113.95"
+            if curl -s "http://$back_ip:3030/api/status" | grep "ok"
+            then
+              #echo "Backend alive, Proceeding"
+              return 1
+            else
+              exit 1
+            fi
+
+      - run:
+          name: Frontend smoke test.
+          command: |
+            #front_url=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/s3bucket_${CIRCLE_WORKFLOW_ID})
+            front_url="http://udapeople-f6cac72.s3-website-us-west-2.amazonaws.com"
+            if curl -s ${front_url} | grep "Welcome"
+            then
+              echo "Frontend alive"
+            else
+              exit 1
+            fi
+      - destroy-environment
+      - revert-migrations
  
 workflows:
   default:
@@ -307,5 +371,6 @@ workflows:
      #       requires: [configure-infrastructure]
      #- deploy-frontend:
              #requires: [run-migrations]
-     - deploy-frontend
+     #- deploy-frontend:
              #requires: [run-migrations]
+      - smoke-test
