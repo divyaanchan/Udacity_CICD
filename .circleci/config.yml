@@ -119,7 +119,6 @@ jobs:
             #./backip.sh >> .circleci/ansible/inventory.txt
             #backendip=$(./backip.sh)
             #curl -H "Content-Type: text/plain" -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request PUT --data "$backendip" https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID}
-			#
             #cwid2=$(echo "aws ec2 describe-instances --filters 'Name=tag:project,Values="udapeopleBackend_${CIRCLE_WORKFLOW_ID:0:7}"' --query 'Reservations[*].Instances[*].PublicDnsName' --output text")
             #echo $cwid2 > backurl.sh; chmod 755 backurl.sh
             #backendurl=$(./backurl.sh)
