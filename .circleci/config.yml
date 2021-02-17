@@ -8,9 +8,9 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            #aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
-            #aws cloudformation delete-stack --stack-name udapeople-backendStack-${CIRCLE_WORKFLOW_ID:0:7}
-            #aws cloudformation delete-stack --stack-name udapeople-frontendStack-${CIRCLE_WORKFLOW_ID:0:7}
+            aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+            aws cloudformation delete-stack --stack-name udapeople-backendStack-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-frontendStack-${CIRCLE_WORKFLOW_ID:0:7}
             echo  "Deleted"
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.  
@@ -19,15 +19,14 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            #SUCCESS=`curl -H "token: bc0ecb36-991a-4dc2-a4a3-5fc4ea7814bd" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}`
-            #if [ "$SUCCESS" == "Migration Successful" ]; 
-            #then
-            #   cd ~/project/backend
-            #   npm install
-            #   npm run migrations:revert
-            #   exit 1
-            #fi
-            exit 0          
+            SUCCESS=`curl -H "token: bc0ecb36-991a-4dc2-a4a3-5fc4ea7814bd" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}`
+            if [ "$SUCCESS" == "Migration Successful" ]; 
+            then
+               cd ~/project/backend
+               npm install
+               npm run migrations:revert
+               exit 1
+            fi        
 jobs:
   build-frontend:
     docker:
@@ -149,10 +148,6 @@ jobs:
             echo $cwid2 > backurl.sh; chmod 755 backurl.sh
             backendurl=$(./backurl.sh)
             curl -H "Content-Type: text/plain" -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request PUT --data "$backendurl" https://api.memstash.io/values/ec2_back_url_${CIRCLE_WORKFLOW_ID}
-            #backendip="18.237.113.95"
-            #backendurl="ec2-18-237-113-95.us-west-2.compute.amazonaws.com"
-            #curl -H "Content-Type: text/plain" -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request PUT --data "$backendip" https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID}
-            #curl -H "Content-Type: text/plain" -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request PUT --data "$backendurl" https://api.memstash.io/values/ec2_back_url_${CIRCLE_WORKFLOW_ID}
             echo "[web]" > .circleci/ansible/inventory.txt
             echo  $backendip >> .circleci/ansible/inventory.txt
             cat  .circleci/ansible/inventory.txt
@@ -253,8 +248,7 @@ jobs:
           # MUST be http not https
           name: Get backend url
           command: |
-            #API_IPback=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID})
-            API_IPback="18.237.113.95"
+            API_IPback=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID})
             export API_URL=$(echo "http://$API_IPback:3030")
             cd frontend
             echo "${API_URL}" > apiurl.txt
@@ -266,8 +260,7 @@ jobs:
             cat apiurl.txt
             npm i
             npm run build
-            #s3Bucket=$(echo "udapeople-${CIRCLE_WORKFLOW_ID:0:7}")
-            s3Bucket="udapeople-f6cac72"
+            s3Bucket=$(echo "udapeople-${CIRCLE_WORKFLOW_ID:0:7}")
             aws s3 sync dist s3://$s3Bucket/
             s3FullUrl=("http://$s3Bucket.s3-website-eu-west-1.amazonaws.com")
             curl -H "Content-Type: text/plain" -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request PUT --data "$s3FullUrl" https://api.memstash.io/values/s3bucket_${CIRCLE_WORKFLOW_ID}
@@ -391,27 +384,27 @@ jobs:
 workflows:
   default:
     jobs:
-     #- build-backend
-     #- build-frontend
-     #- test-frontend:
-     #     requires: [build-frontend]
-     #- test-backend:
-     #     requires: [build-backend]
-     #- scan-backend:
-     #     requires: [build-backend]
-     #- scan-frontend:
-     #     requires: [build-frontend]
-     #- deploy-infrastructure
-     #- configure-infrastructure:
-     #      requires: [deploy-infrastructure]
-     #- run-migrations:
-     #       requires: [configure-infrastructure]
-     #- deploy-frontend:
-             #requires: [run-migrations]
-     #- deploy-frontend:
-             #requires: [run-migrations]
-     # - smoke-test
-     # - cloudfront-update
-              #requires: [smoke-test]
+     - build-backend
+     - build-frontend
+     - test-frontend:
+          requires: [build-frontend]
+     - test-backend:
+          requires: [build-backend]
+     - scan-backend:
+          requires: [build-backend]
+     - scan-frontend:
+          requires: [build-frontend]
+     - deploy-infrastructure
+     - configure-infrastructure:
+           requires: [deploy-infrastructure]
+     - run-migrations:
+            requires: [configure-infrastructure]
+     - deploy-frontend:
+            requires: [run-migrations]
+     - deploy-frontend:
+            requires: [run-migrations]
+      - smoke-test
+      - cloudfront-update
+              requires: [smoke-test]
        - cleanup
-              #requires: [cloudfront-update]
+              requires: [cloudfront-update]
