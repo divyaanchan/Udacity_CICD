@@ -359,15 +359,7 @@ jobs:
           # Note to Make http only request. check cloudfront.yml
           command: |
             echo "Update CloudFront"
-            check_for_id=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
-            if [ -z $check_for_id ]
-            then
-              aws cloudformation deploy --template-file .circleci/files/cloudfront.yml   --stack-name "Udapeople-Cloudfront"  --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
-              echo  $check_for_id
-            else
-              echo "Fresh Deploy"
-              aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront-f6cac72"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="f6cac72"
-            fi
+            aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="f6cac72"
 
  
 workflows:
