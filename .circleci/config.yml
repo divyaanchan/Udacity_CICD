@@ -27,7 +27,7 @@ commands:
             #   npm run migrations:revert
             #   exit 1
             #fi
-            exit 1          
+            exit 0          
 jobs:
   build-frontend:
     docker:
@@ -327,12 +327,10 @@ jobs:
       - run:
           name: Backend  Smoke test
           command: |
-            #back_ip=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID})
-            back_ip="18.237.113.95"
+            back_ip=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID})
             if curl -s "http://$back_ip:3030/api/status" | grep "ok"
             then
-              #echo "Backend alive, Proceeding"
-              return 1
+              echo "Backend alive, Proceeding"
             else
               exit 1
             fi
@@ -340,8 +338,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            #front_url=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/s3bucket_${CIRCLE_WORKFLOW_ID})
-            front_url="http://udapeople-f6cac72.s3-website-us-west-2.amazonaws.com"
+            front_url=$(curl -H "token: e947093d-4e44-45e0-ba3c-90b26352a021" --request GET https://api.memstash.io/values/s3bucket_${CIRCLE_WORKFLOW_ID})
             if curl -s ${front_url} | grep "Welcome"
             then
               echo "Frontend alive"
