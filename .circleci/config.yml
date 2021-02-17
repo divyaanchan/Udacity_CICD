@@ -179,6 +179,10 @@ jobs:
             ls -latr
             cat .env
             npm i
+            npm run build
+            echo "HOST: " $TYPEORM_HOST
+            echo "PWD: " $(pwd)
+            echo $TYPEORM_DATABASE
             npm install oauth-sign
             npm run migrations > migrationresult.txt
       - run:
