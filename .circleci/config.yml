@@ -183,8 +183,11 @@ jobs:
             echo "HOST: " $TYPEORM_HOST
             echo "PWD: " $(pwd)
             echo $TYPEORM_DATABASE
-            npm audit  fix
+            npm audit  fix --force
             npm run migrations > migrationresult.txt
+            echo  "outputs"
+            cat  migrationresult.txt
+            cat /home/circleci/.npm/_logs/*-debug.log
       - run:
           name: Send migration results to memstash
           command: |
