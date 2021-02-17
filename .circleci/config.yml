@@ -361,7 +361,33 @@ jobs:
             echo "Update CloudFront"
             aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowIDnew="f6cac72"
 
- 
+  cleanup:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar 
+            yum -y install gzip
+      - attach_workspace:
+          at: .circleci/ansible/
+      - run:
+          name: Get Old Stack Workflow ID and Remove old stacks and files
+          command: |
+            originalWorkflowID="anchdvydivyaanchan"
+            echo $originalWorkflowID
+            if [ -n "$originalWorkflowID" ]
+            then
+              aws s3 rm s3://udapeople-$originalWorkflowID --recursive
+              aws s3 rb s3://udapeople-$originalWorkflowID --force
+              aws cloudformation delete-stack --stack-name cloudfontlocal
+              aws cloudformation delete-stack --stack-name cloudfontlocal
+            else
+              echo "No old workflow exists"
+            fi
+            
 workflows:
   default:
     jobs:
@@ -385,5 +411,7 @@ workflows:
      #- deploy-frontend:
              #requires: [run-migrations]
      # - smoke-test
-      - cloudfront-update
+     # - cloudfront-update
               #requires: [smoke-test]
+       - cleanup
+              #requires: [cloudfront-update]
