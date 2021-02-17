@@ -332,7 +332,7 @@ jobs:
             then
               echo "Backend alive, Proceeding"
             else
-              exit 1
+              exit 0
             fi
 
       - run:
@@ -343,10 +343,34 @@ jobs:
             then
               echo "Frontend alive"
             else
-              exit 1
+              exit 0
             fi
       - destroy-environment
       - revert-migrations
+
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Update cloudfront distribution
+          # If we have the cloudfront stack existing, update. if not then create from scratch
+          # Note to Make http only request. check cloudfront.yml
+          command: |
+            echo "Update CloudFront"
+            check_for_id=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
+            if [ -z $check_for_id ]
+            then
+              #aws cloudformation deploy --template-file .circleci/files/cloudfront.yml   --stack-name "Udapeople-Cloudfront"  --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
+              echo  $check_for_id
+            else
+              echo "Fresh Deploy"
+              #aws cloudformation delete-stack --stack-name Udapeople-Cloudfront
+              #sleep 240
+              #aws cloudformation deploy  --template-file .circleci/files/cloudfront.yml  --stack-name "Udapeople-Cloudfront"   --region ${AWS_DEFAULT_REGION}   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
+            fi
+
  
 workflows:
   default:
@@ -371,3 +395,5 @@ workflows:
      #- deploy-frontend:
              #requires: [run-migrations]
       - smoke-test
+      - cloudfront-update:
+              requires: [smoke-test]
