@@ -183,7 +183,6 @@ jobs:
             echo "HOST: " $TYPEORM_HOST
             echo "PWD: " $(pwd)
             echo $TYPEORM_DATABASE
-            npm audit  fix --force
             npm run migrations > migrationresult.txt
             echo  "outputs"
             cat  migrationresult.txt
