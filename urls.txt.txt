@@ -1,0 +1,13 @@
+URL01:
+https://github.com/divyaanchan/Udacity_CICD/
+URL02:
+http://udapeople-f6cac72.s3-website-us-west-2.amazonaws.com
+
+url03:
+http://d1dlg0t7kvha5l.cloudfront.net/
+
+ec2 instance  (URL04)
+ec2-18-237-113-95.us-west-2.compute.amazonaws.com
+
+prometheus   (URL05)
+http://ec2-54-218-27-197.us-west-2.compute.amazonaws.com:9090
