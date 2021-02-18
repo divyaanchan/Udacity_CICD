@@ -1,4 +1,5 @@
 version: 2.1
+jobs:
   deploy-frontend:
     docker:
       - image: circleci/node:13.8.0
