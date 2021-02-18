@@ -18,7 +18,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            export  API_URL=http://ec2-54-186-212-157.us-west-2.compute.amazonaws.com:3030
+            export  API_URL=http://ec2-52-12-185-115.us-west-2.compute.amazonaws.com:3030
             npm i
             npm run build
             #s3Bucket=$(echo "udapeople-${CIRCLE_WORKFLOW_ID:0:7}")
