@@ -28,7 +28,31 @@ jobs:
           root: .
           paths:
             - frontend/dist
+
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11
+  # Make sure ubuntu is 20.04 in backend.yml or you will have issues with PM2. read .circleci/backend/files for more info
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - 69:8e:f5:77:fd:38:4a:11:fe:9c:ae:a8:07:9f:10:94
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible tar gzip ansible nodejs npm less
+            pip install awscli
+      - run:
+          name: Deploy backend
+          command: |
+            ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
 workflows:
   default:
     jobs:
      - deploy-frontend
+     - deploy-backend:
+            requires: [deploy-frontend]
